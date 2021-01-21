@@ -3,7 +3,7 @@ import pygame
 pygame.init()
 
 SCREEN_WIDTH = 1920
-SCREEN_HEIGHT = 1280
+SCREEN_HEIGHT = 1080
 
 CENTER_X = SCREEN_WIDTH / 2
 CENTER_Y = SCREEN_HEIGHT / 2
@@ -46,12 +46,16 @@ class Paragraph(Object) :
         self.y = y
         self.surface = None
         self.rect = None
+        self.numline = 0
+        self.font_size = 50
     def write(self) :
+        self.numline = len(self.paragraph)
+        self.y -= (self.numline - 1) * self.font_size * 0.5
         for line in self.paragraph :
             self.surface = font.render(line, True, self.color)
             self.rect = self.surface.get_rect(center = (self.x , self.y))
             screen.blit(self.surface , self.rect)
-            self.y += 50
+            self.y += self.font_size
 
 class Button() :
     def __init__(self , surface,x ,y):
@@ -67,12 +71,12 @@ class Button() :
         self.pos = pygame.mouse.get_pos()
         self.click = pygame.mouse.get_pressed()
         if self.rect.collidepoint(self.pos) :
-            #self.rect = self.surface.get_rect(center = (self.x , self.y + 10)) #Set Move Value
+            self.rect = self.surface.get_rect(center = (self.x , self.y + 10)) 
             for c in self.click :
-                if c > 0:
+                if c > 0 :
                     return True
         else :
-            #self.rect = self.surface.get_rect(center = (self.x , self.y)) #Set Move Value
+            self.rect = self.surface.get_rect(center = (self.x , self.y)) 
             return False
 
 ##Note
