@@ -21,18 +21,22 @@ def main() :
     FPS = 60
     running = True
 
+    background = Object(pygame.image.load('src/pic/menu/BG.jpeg'),CENTER_X ,CENTER_Y)
+    title = Object(pygame.image.load('src/pic/menu/title.png'), CENTER_X ,400)
+    
+    button_1 = Button(pygame.image.load('src/pic/menu/button-1.png'), 750 , 700)
+    button_2 = Button(pygame.image.load('src/pic/menu/button-2.png'), SCREEN_WIDTH - 750 , 700)
+    button_3 = Button(pygame.image.load('src/pic/menu/button-3.png'), 750 , 820)
+    button_4 = Button(pygame.image.load('src/pic/menu/button-4.png'), SCREEN_WIDTH - 750 , 820)
+
     while running:
 
-        background = Object(pygame.image.load('src/pic/menu/BG.jpeg'),CENTER_X ,CENTER_Y)
+        
         background.draw()
         #screen.fill(pygame.Color(255 , 255 , 255 , a = 200)) # To Bright Tone Background
-        title = Object(pygame.image.load('src/pic/menu/title.png'), CENTER_X ,400)
+       
         title.draw()
 
-        button_1 = Button(pygame.image.load('src/pic/menu/button-1.png'), 750 , 700)
-        button_2 = Button(pygame.image.load('src/pic/menu/button-2.png'), SCREEN_WIDTH - 750 , 700)
-        button_3 = Button(pygame.image.load('src/pic/menu/button-3.png'), 750 , 820)
-        button_4 = Button(pygame.image.load('src/pic/menu/button-4.png'), SCREEN_WIDTH - 750 , 820)
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
