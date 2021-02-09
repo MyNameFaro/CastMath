@@ -1,5 +1,57 @@
 import random
 import math
+import numpy as np
+
+class Data():
+    def __init__(self , data = [[0 , 0]] , c = 0 , level = 1):
+        self.data = data
+        self.X = []
+        self.Y = []
+        self.model = []
+        self.c = c #Critical
+        self.level = level #LEVEL
+        self.CRITICAL = 2
+        self.m = 0
+        self.m_previous = 0
+        for d in self.data:
+            self.X.append([1 , d[0]])
+            self.Y.append([d[1]])
+    def train(self) :
+        X = np.matrix(self.X)
+        Y = np.matrix(self.Y)
+        a = X.getT().dot(X)
+        b = a.getI().dot(X.getT())
+        #print(a)
+        self.model = b.dot(Y)
+
+        #set m and m previous
+        self.m_previous = self.m
+        self.m = self.model[1 , 0]
+
+    def append(self , data) :
+        for d in data:
+            self.data.append([len(self.data) + 1 , d])
+            self.X.append([1 , len(self.data)])
+            self.Y.append([d])
+    def get_m(self) :
+        return self.m
+    def get_data(self) :
+        return self.data
+    def get_level(self):
+        return self.level
+    def update(self):
+        if self.m_previous > self.m :
+            self.c -= 1
+        elif self.m_previous < self.m :
+            self.c += 1
+        if self.c >= self.CRITICAL :
+            self.level += 1
+            self.c = 0
+        elif self.c <= (-1 * self.CRITICAL) :
+            self.level -= 1
+            self.c = 0
+
+
 
 def get_exercise_real(level=1) :
     def get_num(level) :
@@ -70,6 +122,8 @@ def get_exercise_real(level=1) :
     elif case == 13 :
         if e < d :
             e += d
+        if c < (e - d):
+            c += (e - d)
         eqt = '(' + str(a * b * c) + '÷' + str(a * b) + ')' + '-' + '(' + str(e) + '-' + str(d) + ')'
         ans = (c) - (e - d)
     elif case == 14 :
@@ -81,7 +135,7 @@ def get_exercise_real(level=1) :
     
     return eqt , str(ans)
 
-def get_exercise_pro(level) :
+def get_exercise_pro(level=1) :
 
     value = [True , False]
 
@@ -100,44 +154,49 @@ def get_exercise_pro(level) :
     c = random.choice(value)
     d = random.choice(value)
 
-    case = random.randint(1 , 15)
+    case = random.randint(1 , 10)
 
     if case == 1:
-        eqt = get_tf(a) + ' ∧ ' + get_tf(b)
+        eqt = get_tf(a) + ' ^ ' + get_tf(b)
         ans = a and b
     elif case == 2:
-        eqt = get_tf(a) + ' ∨ ' + get_tf(b)
+        eqt = get_tf(a) + ' V ' + get_tf(b)
         ans = a or b
     elif case == 3:
-        eqt = '~' + get_tf(a) + ' ∨ ' + get_tf(b)
+        eqt = '~' + get_tf(a) + ' V ' + get_tf(b)
         ans = (not a) or b
     elif case == 4:
-        eqt = get_tf(b) + ' ∧ '+ '~' + get_tf(a)
+        eqt = get_tf(b) + ' ^ '+ '~' + get_tf(a)
         ans = (not a) and b
     elif case == 5:
-        eqt = '~' + get_tf(b) + ' ∧ '+ '~' + get_tf(a)
+        eqt = '~' + get_tf(b) + ' ^ '+ '~' + get_tf(a)
         ans = not(a or b)
     elif case == 6:
-        eqt = '~' + get_tf(b) + ' ∨ '+ '~' + get_tf(a)
+        eqt = '~' + get_tf(b) + ' V '+ '~' + get_tf(a)
         ans = not(a and b)
     elif case == 7:
-        eqt = get_tf(a) + ' ∧ ' + get_tf(b) +  ' ∧ ' +'~' + get_tf(c)
+        eqt = get_tf(a) + ' ^ ' + get_tf(b) +  ' ^ ' +'~' + get_tf(c)
         ans = a and b and (not c)
     elif case == 8:
-        eqt = '~' + '(' + get_tf(a) + ' ∧ ' + get_tf(b) + ')' + ' ∨ '+ '~' + get_tf(c)
+        eqt = '~' + '(' + get_tf(a) + ' ^ ' + get_tf(b) + ')' + ' V '+ '~' + get_tf(c)
         ans = not(a and b) or (not c)
     elif case == 9:
-        eqt = '~' + '(' + get_tf(a) + ' ∨ ' + get_tf(b) + ')' + ' ∧ '+ get_tf(c)
+        eqt = '~' + '(' + get_tf(a) + ' V ' + get_tf(b) + ')' + ' ^ '+ get_tf(c)
         ans = not(a or b) and c
     elif case == 10:
-        eqt = '(' + get_tf(a) + ' ∨ ' + get_tf(b) + ')' + ' ∧ '+ '(' + get_tf(c) + ' ∨ ' + get_tf(d) + ')'
+        eqt = '(' + get_tf(a) + ' V ' + get_tf(b) + ')' + ' ^ '+ '(' + get_tf(c) + ' V ' + get_tf(d) + ')'
         ans = (a or b) and (c or d)
 
     return eqt , get_tf(ans)
 
-for i in range(1 , 15):
-    eqt , ans = get_exercise_real(i)
-    print(ans + " " + eqt)
-for i in range(1 , 10):
-    eqt , ans = get_exercise_pro(i)
-    print(ans + " " + eqt)
+
+x = Data([[1 , 2],[2 , 4]])
+x.train()
+print(x.get_m())
+x.append([6 ,8 ,10])
+x.train()
+print(x.get_m())
+print(x.X)
+print(x.Y)
+y = x.get_data()
+print(y)

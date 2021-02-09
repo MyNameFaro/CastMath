@@ -138,7 +138,7 @@ def course(data) :
                     })
                     running = False
             if event.type == pygame.KEYDOWN :
-                if event.key == pygame.K_p or event.key == pygame.K_SPACE:
+                if event.key == pygame.K_e:
                     progress.run(time)
                     voice = Thread(target = voice_control.main, args = [TIME_LIMIT])
                     voice.start()

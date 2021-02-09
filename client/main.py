@@ -27,7 +27,7 @@ pygame.display.update()
 #clock.tick(brand_time)
 
 #link_to('login')
-link_to('play_zone')
+link_to('test_faro')
 
 #PAGE REPRESENT
 

@@ -10,6 +10,8 @@ CENTER_Y = SCREEN_HEIGHT / 2
 
 screen = pygame.display.set_mode((SCREEN_WIDTH , SCREEN_HEIGHT))
 
+padding = 200
+
 def screen_init() :
     return screen
 
