@@ -47,7 +47,7 @@ def get_doc(doc,name) :
 def update(doc,name,data) :
     doc_ref = db.collection(doc).document(name)
     try:
-        print(data)
+        #print(data)
         doc_ref.update(data)
     except:
         return "error"
@@ -84,3 +84,5 @@ def remove_arr(doc,name,arr,val) :
     city_ref = db.collection(doc).document(name)
     city_ref.update({arr: firestore.ArrayRemove([val])})
     return 0
+
+#add(u'dataset',u'learning_excercis' , {u"data" ," 555 "})

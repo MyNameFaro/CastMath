@@ -2,20 +2,26 @@ import random
 import math
 import numpy as np
 
+
+
+COUSE1 = 120
+COUSE2 = 50
+COUSE3 = 20
+COUSE4 = 20
+
 class Data():
-    def __init__(self , data = [[0 , 0]] , c = 0 , level = 1):
-        self.data = data
+    def __init__(self , data = [0 , 0] , c = 0 , level = 1):
         self.X = []
         self.Y = []
         self.model = []
         self.c = c #Critical
         self.level = level #LEVEL
-        self.CRITICAL = 2
+        self.CRITICAL = 4
         self.m = 0
-        self.m_previous = 0
-        for d in self.data:
-            self.X.append([1 , d[0]])
-            self.Y.append([d[1]])
+        self.e = 0
+        for d in data:
+            self.X.append([1 , len(self.X) + 1])
+            self.Y.append([d])
     def train(self) :
         X = np.matrix(self.X)
         Y = np.matrix(self.Y)
@@ -25,25 +31,28 @@ class Data():
         self.model = b.dot(Y)
 
         #set m and m previous
-        self.m_previous = self.m
         self.m = self.model[1 , 0]
-
+        self.e = self.model[0 , 0]
+    def test(self, y):
+        if y < self.e + (self.m * (len(self.X) + 1)) : #LINEAR 
+            self.c -= 1 
+        elif y > self.e + (self.m * (len(self.X) + 1)) : #LINEAR 
+            self.c += 1 
     def append(self , data) :
         for d in data:
-            self.data.append([len(self.data) + 1 , d])
-            self.X.append([1 , len(self.data)])
+            #self.data.append([len(self.data) + 1 , d])
+            self.X.append([1 , len(self.X) + 1])
             self.Y.append([d])
     def get_m(self) :
         return self.m
     def get_data(self) :
-        return self.data
+        data = []
+        for y in self.Y :
+            data.append(y[0])
+        return data
     def get_level(self):
         return self.level
     def update(self):
-        if self.m_previous > self.m :
-            self.c -= 1
-        elif self.m_previous < self.m :
-            self.c += 1
         if self.c >= self.CRITICAL :
             self.level += 1
             self.c = 0
@@ -190,13 +199,13 @@ def get_exercise_pro(level=1) :
     return eqt , get_tf(ans)
 
 
-x = Data([[1 , 2],[2 , 4]])
-x.train()
-print(x.get_m())
-x.append([6 ,8 ,10])
-x.train()
-print(x.get_m())
-print(x.X)
-print(x.Y)
-y = x.get_data()
-print(y)
+#x = Data([2 , 4])
+#x.train()
+#print(x.get_m())
+#x.append([6 ,8 ,10])
+#x.train()
+#p#rint(x.get_m())
+#print(x.X)
+#print(x.Y)
+#y = x.get_data()
+#print(y)

@@ -37,14 +37,23 @@ def main(argument) :
                 sys.exit()
             if event.type == pygame.KEYDOWN :
                 if event.key == pygame.K_KP_ENTER or event.key == pygame.K_RETURN:
-                    link_to('get_regis' , {
+                    link_to('get_regis' , [{
                         u'username' : username.get_value(),
                         u'id' : id(),
                         u'e-mail' : email.get_value(),
                         u'password' : str(password.get_value()),
                         u'lastname' : lastname.get_value(),
-                        u'name' : name.get_value()
-                    })
+                        u'name' : name.get_value(),
+                    },{
+                        u"level1":1,
+                        u"progress1":0,
+                        u"level2":1,
+                        u"progress2":0,
+                        u"level3":1,
+                        u"progress3":0,
+                        u"level4":1,
+                        u"progress4":0,
+                    }])
                     running = False
             if event.type == pygame.MOUSEBUTTONDOWN :
                 if name.onclick() :
@@ -78,14 +87,23 @@ def main(argument) :
                     active = email
                     active.get_active()
                 if submit.onclick() :
-                    link_to('get_regis' , {
+                    link_to('get_regis' , [{
                         u'username' : username.get_value(),
                         u'id' : id(),
                         u'e-mail' : email.get_value(),
                         u'password' : str(password.get_value()),
                         u'lastname' : lastname.get_value(),
-                        u'name' : name.get_value()
-                    })
+                        u'name' : name.get_value(),
+                    },{
+                        u"level1":0,
+                        u"progress1":0,
+                        u"level2":0,
+                        u"progress2":0,
+                        u"level3":0,
+                        u"progress3":0,
+                        u"level4":0,
+                        u"progress4":0,
+                    }])
                     running = False
                 if have_accout.onclick() :
                     link_to('login')

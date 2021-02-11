@@ -7,6 +7,7 @@ import database
 import login
 import regis
 import seeker
+import user_zone
 import test_faro
 from component import *
 from method import *
@@ -21,13 +22,13 @@ clock = pygame.time.Clock()
 
 brand_time = 0.3 #LOGO TIME LONG
 screen.fill((255 , 255 ,255))
-yrc_logo = Object(pygame.image.load('./src/pic/YRC.png') ,CENTER_X , CENTER_Y)
+yrc_logo = Object(pygame.image.load('./src/pic/YRC.png').convert_alpha() ,CENTER_X , CENTER_Y)
 yrc_logo.draw()
 pygame.display.update()
 #clock.tick(brand_time)
 
 #link_to('login')
-link_to('test_faro')
+link_to('login')
 
 #PAGE REPRESENT
 
@@ -40,13 +41,17 @@ def exit(argument) :
 
 session = {
     "user_id" : None,
-    "username" : "TEST"
+    "username" : None
 }
 
 def get_regis(data) :
-    database.add(u'users',data[u'id'],data) #add to user , data.id , data
+    users = data[0]
+    learning = data[1]
+    database.add(u'users',users[u'id'],users) #add to user , data.id , data
+    database.add(u'learning',users[u'id'],learning)
+    #database.add_arr(u'users' ,data[u'id'],u"data",[0])
     link_to('login')
-    return 0
+    return 
 
 def get_login(data) :
     accout = database.search(u'users' , u'username' , data[u'username'])
@@ -60,7 +65,7 @@ def get_login(data) :
                 print(session['user_id'])
                 link_to('menu' , session)
                 return 0
-        link_to('login' , False)
+        link_to('menu' , session)
     
 pages = {
     'menu' : menu.main,
@@ -74,7 +79,8 @@ pages = {
     'get_regis' : get_regis,
     'get_login' : get_login,
     'seeker' : seeker.main,
-    'test_faro' : test_faro.main
+    'test_faro' : test_faro.main,
+    'user_zone' : user_zone.main
 } 
 
 while running :
@@ -84,5 +90,5 @@ while running :
     else:
         pages[page](argument) 
 
- 
+
     

@@ -1,1 +1,1 @@
-__all__ = ['main','client','method','study_zone','voice_control','component','menu', 'test_faro','dynamic_course' ,'play_zone' ,'login','regis','seeker','database']
+__all__ = ['main','client','method','study_zone','user_zone','voice_control','component','menu', 'test_faro','dynamic_course' ,'play_zone' ,'login','regis','seeker','database']

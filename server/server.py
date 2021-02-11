@@ -1,27 +1,29 @@
 import socket
-import json
+import pickle
 import threading
 import seeker
+import pygame
 
-SERVER_IP = "192.168.43.210"
+SERVER_IP = "192.168.43.175"
 PORT = 3000
 
-BUFFER = 1024
+BUFFER = 4096
 
 clients = []
 
+seeker = pygame.sprite.Group()
+
+    
+    ############INIT
+
 def service(client , address) :
     while True:
-        recv = json.loads(client.recv(BUFFER).decode('utf-8'))
+        recv = pickle.loads(client.recv(BUFFER))
         if not data :
             clients.remove(client)
             break
-        method = {
-            "position"
-        }
-        send = pages[page]() 
         for c in clients :
-            c.sendall(json.dumps(send).encode('utf-8'))
+            c.sendall(pickle.dumps(recv))
 
     client.close()
 

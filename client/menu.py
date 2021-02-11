@@ -20,14 +20,15 @@ def main(session) :
     FPS = 60
     running = True
 
-    background = Object(pygame.image.load('./src/pic/menu/BGVN.png'),CENTER_X ,CENTER_Y)
-    shade = Object(pygame.image.load('./src/pic/menu/dark_mask.png'),CENTER_X ,CENTER_Y)
-    title = Object(pygame.image.load('./src/pic/menu/title.png'), CENTER_X ,400)
-    user_zone = Text_button("ยินดีต้อนรับ + - × ÷" + session["username"], SCREEN_WIDTH - 300, 200 , right = True)
-    button_1 = Button(pygame.image.load('./src/pic/menu/button-1.png'), 750 , 700)
-    button_2 = Button(pygame.image.load('./src/pic/menu/button-2.png'), SCREEN_WIDTH - 750 , 700)
-    button_3 = Button(pygame.image.load('./src/pic/menu/button-3.png'), 750 , 820)
-    button_4 = Button(pygame.image.load('./src/pic/menu/button-4.png'), SCREEN_WIDTH - 750 , 820)
+    background = Object(pygame.image.load('./src/pic/menu/BGVN.png').convert_alpha(),CENTER_X ,CENTER_Y)
+    shade = Object(pygame.image.load('./src/pic/menu/dark_mask.png').convert_alpha(),CENTER_X ,CENTER_Y)
+    title = Object(pygame.image.load('./src/pic/menu/title.png').convert_alpha(), CENTER_X ,400)
+    user_zone = Text_button("ยินดีต้อนรับ " + session["username"], SCREEN_WIDTH - 340, 200 , right = True)
+    profile = Button(pygame.image.load('./src/pic/menu/profile_2.png').convert_alpha(), SCREEN_WIDTH - 310 , 200)
+    button_1 = Button(pygame.image.load('./src/pic/menu/button-1.png').convert_alpha(), 750 , 700)
+    button_2 = Button(pygame.image.load('./src/pic/menu/button-2.png').convert_alpha(), SCREEN_WIDTH - 750 , 700)
+    button_3 = Button(pygame.image.load('./src/pic/menu/button-3.png').convert_alpha(), 750 , 820)
+    button_4 = Button(pygame.image.load('./src/pic/menu/button-4.png').convert_alpha(), SCREEN_WIDTH - 750 , 820)
 
     time = 0.00
 
@@ -51,23 +52,27 @@ def main(session) :
                     link_to('study_zone')
                     running = False #Close This Page
 
-                elif button_2.onclick() :
+                if button_2.onclick() :
                     link_to('play_zone')
                     running = False #Close This Page
 
-                elif button_3.onclick() :
-                    link_to('study_zone')
+                if button_3.onclick() :
+                    link_to('seeker' , session)
                     running = False #Close This Page
 
-                elif button_4.onclick() :
+                if button_4.onclick() :
                     link_to('exit')
                     running = False #Close This Page
+                if user_zone.onclick() or profile.onclick() :
+                    link_to('user_zone')
+                    running = False
 
         button_1.draw()
         button_2.draw()
         button_3.draw()
         button_4.draw()
         user_zone.draw()
+        profile.draw()
 
         pygame.display.update()
         clock.tick(FPS)

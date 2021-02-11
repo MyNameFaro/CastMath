@@ -15,7 +15,7 @@ padding = 200
 def screen_init() :
     return screen
 
-font = pygame.font.SysFont("kanit", 32)
+font = pygame.font.SysFont("kanit", 20)
 
 class Object(): 
     def __init__(self ,surface ,x ,y) :
@@ -82,10 +82,10 @@ class Button() :
             self.rect = self.surface.get_rect(center = (self.x , self.y)) 
             return False
 
-class Text_button:
+class Text_button():
     def __init__(self , text, x , y,size = 32,color = (255 , 255 , 255) , right = False , left = False):
         font = pygame.font.SysFont("kanit", size)
-        self.surface = font.render(text, True,color)
+        self.surface = font.render(str(text), True,color)
         if right:
             self.rect = self.surface.get_rect(midright = (x , y)) 
         elif left:
@@ -102,12 +102,12 @@ class Text_button:
         self.pos = pygame.mouse.get_pos()
         self.click = pygame.mouse.get_pressed()
         if self.rect.collidepoint(self.pos) :
-            self.rect = self.surface.get_rect(center = (self.x , self.y + 10)) 
+            #self.rect = self.surface.get_rect(center = (self.x , self.y + 10)) 
             for c in self.click :
                 if c > 0 :
                     return True
         else :
-            self.rect = self.surface.get_rect(center = (self.x , self.y)) 
+            #self.rect = self.surface.get_rect(center = (self.x , self.y)) 
             return False
 
 class Textbox():
@@ -158,23 +158,34 @@ class Textbox():
             return False    
 
 class Progress():
-    def __init__(self,time_limit , color, x , y):
+    def __init__(self,time_limit , color, x , y ,percent=100 ,infinite=False ,text="",txt_color=(36 , 36 ,36)):
         self.time_limit = time_limit
         self.time_start = 0.0
         self.color = color
         self.x = x
         self.y = y
+        self.text = font.render(text, True,txt_color)
+        self.text_rect = self.text.get_rect(center = (x, y))
+        self.percent = percent / 100
         self.running = False
         self.time = 0.0
+        self.infinite = infinite
+        self.full = 0
     def run(self , time_start) :
         self.time_start = float(time_start)
         self.running = True
     def update(self , time):
         if self.running :
-            if (time - self.time_start) >= float(self.time_limit):
+            if (time - self.time_start) >= float(self.time_limit) * (self.percent):
                 self.running = False
-            pygame.draw.rect(screen , self.color , pygame.Rect(self.x - 200 , self.y - 30 , 400 , 60),2) #FIGURE
-            pygame.draw.rect(screen , self.color , pygame.Rect(self.x - 200 , self.y - 30 , 400 * ((time - self.time_start) / self.time_limit) , 60)) #SCALE
+                self.full = (time - self.time_start)
+            pygame.draw.rect(screen , self.color , pygame.Rect(self.x - 150 , self.y - 30 , 300 , 60),2) #FIGURE
+            pygame.draw.rect(screen , self.color , pygame.Rect(self.x - 150 , self.y - 30 , 300 * ((time - self.time_start) / self.time_limit) , 60)) #SCALE
+            screen.blit(self.text , self.text_rect)
+        elif self.infinite :
+            pygame.draw.rect(screen , self.color , pygame.Rect(self.x - 150 , self.y - 30 , 300 , 60),2) #FIGURE
+            pygame.draw.rect(screen , self.color , pygame.Rect(self.x - 150 , self.y - 30 , 300 * (self.full / self.time_limit) , 60))
+            screen.blit(self.text , self.text_rect)
 ##Note
 ##ex . button1 = Button(surface , x , y)
 ## IF you want to set an img to a button : button1 = pygame.image.load(...), x , y)

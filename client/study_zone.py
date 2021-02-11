@@ -4,6 +4,8 @@ from method import *
 from component import *
 import voice_control
 from threading import Thread
+import database
+import dynamic_course
 
 pygame.init()
 
@@ -12,11 +14,12 @@ pygame.init()
 clock = pygame.time.Clock()
 running = True
 
+
 class Column():
     def __init__(self , n):
         self.n = n
-        self.img = Object(pygame.image.load('./src/pic/study_zone/logo_' + str(self.n) + '.png') , CENTER_X , CENTER_Y - 50)
-        self.title = Button(pygame.image.load('./src/pic/study_zone/title_' + str(self.n) + '_little.png'), CENTER_X - 5 , CENTER_Y + 225)
+        self.img = Object(pygame.image.load('./src/pic/study_zone/logo_' + str(self.n) + '.png').convert() , CENTER_X , CENTER_Y - 50)
+        self.title = Button(pygame.image.load('./src/pic/study_zone/title_' + str(self.n) + '_little.png').convert(), CENTER_X - 5 , CENTER_Y + 225)
         self.pos = None
         self.click = None
     def draw(self):
@@ -33,19 +36,19 @@ class Column():
             return False
 
 ##MENU OF STUDY_ZONE
-def main(argument) : 
+def main(session) : 
 
     FPS = 60
     running = True
 
     n = 0
 
-    background = Object(pygame.image.load('./src/pic/study_zone/CLASSROOM.png'),CENTER_X ,CENTER_Y)
-    shade = Object(pygame.image.load('./src/pic/menu/dark_mask.png'),CENTER_X ,CENTER_Y)
+    background = Object(pygame.image.load('./src/pic/study_zone/CLASSROOM.png').convert(),CENTER_X ,CENTER_Y)
+    shade = Object(pygame.image.load('./src/pic/menu/dark_mask.png').convert_alpha(),CENTER_X ,CENTER_Y)
     title = Text("เรียนรู้" , (255 , 255 , 0) , CENTER_X , CENTER_Y - 340,size=100)
-    button_menu = Button(pygame.image.load('./src/pic/study_zone/menu.png'), CENTER_X , SCREEN_HEIGHT - 200)
-    button_left = Button(pygame.image.load('./src/pic/study_zone/left.png'), CENTER_X - 350, CENTER_Y)
-    button_right = Button(pygame.image.load('./src/pic/study_zone/right.png'), CENTER_X + 350, CENTER_Y)
+    button_menu = Button(pygame.image.load('./src/pic/study_zone/menu.png').convert_alpha(), CENTER_X , SCREEN_HEIGHT - 200)
+    button_left = Button(pygame.image.load('./src/pic/study_zone/left.png').convert_alpha(), CENTER_X - 350, CENTER_Y)
+    button_right = Button(pygame.image.load('./src/pic/study_zone/right.png').convert_alpha(), CENTER_X + 350, CENTER_Y)
     
 
     while running:
@@ -70,11 +73,10 @@ def main(argument) :
         shade.draw()
 
         if col_1.onclick() :
-            link_to('course',{
+            link_to('course',[{
                 "course" : str(n + 1),
-                "session" : '1',
-                "page" : '1'
-            })
+                "page" : database.get_doc(u'learning',session['user_id'])['progress' + str(n + 1)]
+            },session])
             running = False
 
         col_1.draw()
@@ -97,22 +99,34 @@ def course(data) :
     padding = 200
 
     time = 0.00
+    time_start = 0.0
 
     TIME_LIMIT = 1
-    try :
-        background = Object(pygame.image.load('./src/pic/study_zone/COURSE/' + str(data['course']) + str(data['session']) + str(data['page']) + '.png') , CENTER_X , CENTER_Y)
-    except :
-        link_to('study_zone')
-        running = False   
-    button_menu = Button(pygame.image.load('./src/pic/study_zone/menu.png'), CENTER_X , SCREEN_HEIGHT - 80 - padding)
-    button_left = Button(pygame.image.load('./src/pic/study_zone/left.png'), 150 + padding, SCREEN_HEIGHT - 80- padding)
-    button_right = Button(pygame.image.load('./src/pic/study_zone/right.png'), SCREEN_WIDTH - 150 - padding, SCREEN_HEIGHT - 80- padding)
 
-    progress = Progress(TIME_LIMIT , (0 , 200 , 200) , CENTER_X , CENTER_Y)
+    button_menu = Button(pygame.image.load('./src/pic/study_zone/menu.png').convert_alpha(), CENTER_X , SCREEN_HEIGHT - 80 - padding)
+    button_left = Button(pygame.image.load('./src/pic/study_zone/left.png').convert_alpha(), 150 + padding, SCREEN_HEIGHT - 80- padding)
+    button_right = Button(pygame.image.load('./src/pic/study_zone/right.png').convert_alpha(), SCREEN_WIDTH - 150 - padding, SCREEN_HEIGHT - 80- padding)
+
+    learning = dynamic_course.Data( database.get_doc(u'dataset' , u'learning')['value'] , level = 0)
+
+    progress = Progress(TIME_LIMIT , (0 , 200 , 200) , CENTER_X , 700 ,text = "ลองพูด",txt_color=(255 , 255 ,255))
 
     while running:
 
+        try :
+            background = Object(pygame.image.load('./src/pic/study_zone/COURSE/' + str(data[0]['course']) + str(data[0]['page']) + '.png').convert() , CENTER_X , CENTER_Y)
+        except :
+            link_to('study_zone')
+            running = False   
+
         time += 1 / FPS
+
+        if learning.get_level() < 0:
+            database.update(u"dataset",u"learning",{
+                u"value" : learning.get_data()
+            })       
+            link_to('test_faro' , data[1])
+            running = False
        
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -120,50 +134,79 @@ def course(data) :
                 pygame.quit()
                 sys.exit()
             if event.type == pygame.MOUSEBUTTONDOWN :
-                if button_menu.onclick() :
+                if button_menu.onclick() : 
                     link_to('menu')
                     running = False
-                if button_right.onclick() :
-                    link_to('course',{
-                        "course" : data['course'],
-                        "session" : data['session'],
-                        "page" : str(int(data['page']) + 1)
+                if button_right.onclick() : ###NEXT
+                    data[0]['page'] = str(int(data[0]['page']) + 1)
+                    
+                    #print(time - time_start)
+
+                    learning.train()
+                    learning.test(time - time_start)
+                    learning.update()
+                    learning.append([time - time_start])
+
+                    time_start = 0.0
+
+                    database.update(u"learning",data[1]['user_id'],{
+                        u"progress"+str(data[0]['course']) : str(int(data[0]['page']) + 1)
                     })
-                    running = False
-                if button_left.onclick() :
-                    link_to('course',{
-                        "course" : data['course'],
-                        "session" : data['session'],
-                        "page" : str(int(data['page']) - 1)
-                    })
-                    running = False
+                    #running = False
+                if button_left.onclick() :  ##LEFT
+                    data[0]['page'] = str(int(data[0]['page']) - 1)
+                    #running = False
             if event.type == pygame.KEYDOWN :
                 if event.key == pygame.K_e:
                     progress.run(time)
                     voice = Thread(target = voice_control.main, args = [TIME_LIMIT])
                     voice.start()
-        
+                if event.key == pygame.K_a:  ##PREVIOUS
+                    data[0]['page'] = str(int(data[0]['page']) - 1)
+                    #running = False
+                if event.key == pygame.K_d: ##NEXT
+                    data[0]['page'] = str(int(data[0]['page']) + 1)
+                    
+                    #print(time - time_start)
+
+                    learning.train()
+                    learning.test(time - time_start)
+                    learning.update()
+                    learning.append([time - time_start])
+
+                    time_start = 0.0
+
+                    database.update(u"learning",data[1]['user_id'],{
+                        u"progress"+str(data[0]['course']) : str(int(data[0]['page']) + 1)
+                    }) 
+                    #running = False
         if voice_control.ANS == "NEXT" :
-            voice_control.ANS = 0
-            link_to('course',{
-            "course" : data['course'],
-            "session" : data['session'],
-            "page" : str(int(data['page']) + 1)
+            data[0]['page'] = str(int(data[0]['page']) + 1)
+                    
+                    #print(time - time_start)
+
+            learning.train()
+            learning.test(time - time_start)
+            learning.update()
+            learning.append([time - time_start])
+
+            time_start = 0.0
+
+            database.update(u"learning",data[1]['user_id'],{
+                u"progress"+str(data[0]['course']) : str(int(data[0]['page']) + 1)
             })
-            running = False
+            #running = False
 
         if voice_control.ANS == "PREVIOUS" :
             voice_control.ANS = 0
-            link_to('course',{
-            "course" : data['course'],
-            "session" : data['session'],
-            "page" : str(int(data['page']) - 1)
-            })
-            running = False
+            data[0]['page'] = str(int(data[0]['page']) - 1)
+            #running = False
 
         background.draw()
-        button_right.draw()
-        button_left.draw()
+        if int(data[0]['page']) < dynamic_course.COUSE1:
+            button_right.draw()
+        if int(data[0]['page']) > 0:
+            button_left.draw()
         progress.update(time)
         button_menu.draw()
 
