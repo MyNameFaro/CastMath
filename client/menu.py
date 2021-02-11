@@ -53,7 +53,7 @@ def main(session) :
                     running = False #Close This Page
 
                 if button_2.onclick() :
-                    link_to('play_zone')
+                    link_to('play_zone' , session)
                     running = False #Close This Page
 
                 if button_3.onclick() :

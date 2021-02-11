@@ -21,26 +21,27 @@ class Column():
     
 
 ##MENU OF STUDY_ZONE
-def main(argument) : 
+def main(session) : 
 
     FPS = 60
     running = True
 
     n = 0
 
-    background = Object(pygame.image.load('./src/pic/menu/BG.jpeg'),CENTER_X ,CENTER_Y)
-    shade = Object(pygame.image.load('./src/pic/menu/dark_mask.png'),CENTER_X ,CENTER_Y)
+    background = Object(pygame.image.load('./src/pic/menu/BG.jpeg').convert(),CENTER_X ,CENTER_Y)
+    shade = Object(pygame.image.load('./src/pic/menu/dark_mask.png').convert_alpha(),CENTER_X ,CENTER_Y)
     title = Text("สนุกสนาน" , (255 , 255 , 0) , CENTER_X , CENTER_Y - 340, size=100)
-    search = Textbox(pygame.image.load('src/pic/login/textbox.png') , u"ค้นหาห้อง" , CENTER_X - 70, CENTER_Y - 250)
+    search = Textbox(pygame.image.load('src/pic/login/textbox.png').convert_alpha() , u"ค้นหาห้อง" , CENTER_X - 70, CENTER_Y - 250)
     search_button = Text_button("ค้นหา" , CENTER_X + 200, CENTER_Y - 250  , color = (40 , 40 , 40))
-    button_menu = Button(pygame.image.load('./src/pic/study_zone/menu.png'), CENTER_X , SCREEN_HEIGHT - 200)
-    button_left = Button(pygame.image.load('./src/pic/study_zone/left.png'), CENTER_X - 350, CENTER_Y)
-    button_right = Button(pygame.image.load('./src/pic/study_zone/right.png'), CENTER_X + 350, CENTER_Y)
+    create = Button(pygame.image.load('./src/pic/play_zone/create.png').convert_alpha(), CENTER_X , CENTER_Y + 250)
+    button_menu = Button(pygame.image.load('./src/pic/study_zone/menu.png').convert_alpha(), CENTER_X , SCREEN_HEIGHT - 200)
+    button_left = Button(pygame.image.load('./src/pic/study_zone/left.png').convert_alpha(), CENTER_X - 350, CENTER_Y)
+    button_right = Button(pygame.image.load('./src/pic/study_zone/right.png').convert_alpha(), CENTER_X + 350, CENTER_Y)
 
     while running:
 
         button_lists = []
-        game_list = [{"id":"00001" , "name" : "กุ๊กกิ๊ก"} , {"id":"00001" , "name" : "กุ๊กกิ๊ก"} , {"id":"00001" , "name" : "กุ๊กกิ๊ก"}]
+        game_list = []
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -57,6 +58,9 @@ def main(argument) :
                     running = False
                 if search.onclick():
                     search.get_active()
+                if create.onclick():
+                    link_to('create_room',session)
+                    running = False
                 for b in button_lists:
                     if b.onclick():
                         link_to('menu')
@@ -80,6 +84,7 @@ def main(argument) :
         button_left.draw()
         button_right.draw()
         search.draw()
+        create.draw()
         search_button.draw()
 
         i = 0
@@ -96,85 +101,82 @@ def main(argument) :
         pygame.display.update()
         clock.tick(FPS)
 
+def create_room(session) : 
 
-def course(data) :
-    #MATH OPERATION
     FPS = 60
     running = True
 
-    padding = 200
+    n = 0
 
-    time = 0.00
+    room_id = id()
 
-    TIME_LIMIT = 1
-    try :
-        background = Object(pygame.image.load('./src/pic/study_zone/COURSE/' + str(data['course']) + str(data['session']) + str(data['page']) + '.png') , CENTER_X , CENTER_Y)
-    except :
-        link_to('study_zone')
-        running = False   
-    button_menu = Button(pygame.image.load('./src/pic/study_zone/menu.png'), CENTER_X , SCREEN_HEIGHT - 80 - padding)
-    button_left = Button(pygame.image.load('./src/pic/study_zone/left.png'), 150 + padding, SCREEN_HEIGHT - 80- padding)
-    button_right = Button(pygame.image.load('./src/pic/study_zone/right.png'), SCREEN_WIDTH - 150 - padding, SCREEN_HEIGHT - 80- padding)
-
-    progress = Progress(TIME_LIMIT , (0 , 200 , 200) , CENTER_X , CENTER_Y)
+    background = Object(pygame.image.load('./src/pic/menu/BG.jpeg').convert(),CENTER_X ,CENTER_Y)
+    shade = Object(pygame.image.load('./src/pic/menu/dark_mask.png').convert_alpha(),CENTER_X ,CENTER_Y)
+    title = Text(str(room_id) , (255 , 255 , 0) , CENTER_X , CENTER_Y - 340, size=100)
+    #search = Textbox(pygame.image.load('src/pic/login/textbox.png') , u"ค้นหาห้อง" , CENTER_X, CENTER_Y - 300)
+    #search_button = Text_button("ค้นหา" , CENTER_X + 200, CENTER_Y - 250  , color = (40 , 40 , 40))
+    start = Button(pygame.image.load('./src/pic/play_zone/start.png').convert_alpha(), CENTER_X , CENTER_Y + 250)
+    button_menu = Button(pygame.image.load('./src/pic/study_zone/menu.png').convert_alpha(), CENTER_X , SCREEN_HEIGHT - 200)
+    button_left = Button(pygame.image.load('./src/pic/study_zone/left.png').convert_alpha(), CENTER_X - 350, CENTER_Y)
+    button_right = Button(pygame.image.load('./src/pic/study_zone/right.png').convert_alpha(), CENTER_X + 350, CENTER_Y)
 
     while running:
 
-        time += 1 / FPS
-       
+        button_lists = []
+        game_list = [{"id":session['user_id'] , "name" : session['username']}]
+
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
                 pygame.quit()
                 sys.exit()
             if event.type == pygame.MOUSEBUTTONDOWN :
+                if button_left.onclick() :
+                    n = (n + 1) % 4
+                if button_right.onclick() :
+                    n = (n - 1) % 4
                 if button_menu.onclick() :
                     link_to('menu')
                     running = False
-                if button_right.onclick() :
-                    link_to('course',{
-                        "course" : data['course'],
-                        "session" : data['session'],
-                        "page" : str(int(data['page']) + 1)
-                    })
+                if start.onclick() :
+                    link_to('seeker', session)
                     running = False
-                if button_left.onclick() :
-                    link_to('course',{
-                        "course" : data['course'],
-                        "session" : data['session'],
-                        "page" : str(int(data['page']) - 1)
-                    })
-                    running = False
-            if event.type == pygame.KEYDOWN :
-                if event.key == pygame.K_p or event.key == pygame.K_SPACE:
-                    progress.run(time)
-                    voice = Thread(target = voice_control.main, args = [TIME_LIMIT])
-                    voice.start()
+            if event.type == pygame.KEYDOWN:
+                if search != None:
+                    if event.key == pygame.K_BACKSPACE:
+                        search.input("BACK")
+                    else :
+                        char = event.unicode
+                        search.input(char)
         
-        if voice_control.ANS == "NEXT" :
-            voice_control.ANS = 0
-            link_to('course',{
-            "course" : data['course'],
-            "session" : data['session'],
-            "page" : str(int(data['page']) + 1)
-            })
-            running = False
+        col_1 = Column(n + 1)
 
-        if voice_control.ANS == "PREVIOUS" :
-            voice_control.ANS = 0
-            link_to('course',{
-            "course" : data['course'],
-            "session" : data['session'],
-            "page" : str(int(data['page']) - 1)
-            })
-            running = False
 
         background.draw()
-        button_right.draw()
-        button_left.draw()
-        progress.update(time)
-        button_menu.draw()
+        shade.draw()
 
+        col_1.draw()
+        title.draw()
+        button_menu.draw()
+        button_left.draw()
+        button_right.draw()
+        #search.draw()
+        start.draw()
+        #search_button.draw()
+
+        i = 0
+        for g in game_list:
+            button_list = Text_button(g["id"] + " " + g["name"] , CENTER_X - 280, CENTER_Y - 180 + (50 * i)  , color = (225 , 0 , 40) ,left=True)
+            button_lists.append(button_list)
+            i += 1
+
+        for b in button_lists:
+            b.draw()
+
+        #link_to('unit_1')
+        #running = False
         pygame.display.update()
         clock.tick(FPS)
+
+
 

@@ -80,7 +80,8 @@ pages = {
     'get_login' : get_login,
     'seeker' : seeker.main,
     'test_faro' : test_faro.main,
-    'user_zone' : user_zone.main
+    'user_zone' : user_zone.main,
+    'create_room' :play_zone.create_room
 } 
 
 while running :
